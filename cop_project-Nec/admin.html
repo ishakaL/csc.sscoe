@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Computer Science Department</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: var(--dark);
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu a {
+            padding: 15px 20px;
+            color: var(--light);
+            text-decoration: none;
+            display: block;
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--secondary);
+            color: white;
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Content Area */
+        .content-area {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .card h3 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Post Management */
+        .post-list {
+            margin-top: 20px;
+        }
+
+        .post-item {
+            background: var(--light);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .login-instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hidden class for toggling content */
+        .hidden {
+            display: none;
+        }
+
+        /* Active menu item */
+        .active {
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-form">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Enter password">
+            </div>
+            <button onclick="login()" class="btn btn-primary" style="width: 100%;">Login</button>
+            
+            <div class="login-instructions">
+                <strong>Demo Credentials:</strong><br>
+                Username: COMPUTERDPT<br>
+                Password: csd@123!#
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>CS Dept Admin</h2>
+                <small>Shehu Shagari College Of Education</small>
+            </div>
+            <div class="sidebar-menu">
+                <a href="#" class="active" onclick="showSection('dashboard')">
+                    📊 Dashboard
+                </a>
+                <a href="#" onclick="showSection('home')">
+                    🏠 Home Page
+                </a>
+                <a href="#" onclick="showSection('about')">
+                    ℹ️ About Us
+                </a>
+                <a href="#" onclick="showSection('staff')">
+                    👥 Staff
+                </a>
+                <a href="#" onclick="showSection('blog')">
+                    📝 Blog/News
+                </a>
+                <a href="#" onclick="showSection('programmes')">
+                    🎓 Programmes
+                </a>
+                <a href="#" onclick="showSection('contact')">
+                    📞 Contact Us
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 id="pageTitle">Admin Dashboard</h1>
+                <div class="user-info">
+                    <span>Welcome, COMPUTERDPT</span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="section">
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <h3>Total Posts</h3>
+                            <div class="number" id="totalPosts">0</div>
+                        </div>
+                        <div class="card">
+                            <h3>Staff Members</h3>
+                            <div class="number" id="totalStaff">0</div>
+                        </div>
+                        <div class="card">
+                            <h3>Programmes</h3>
+                            <div class="number" id="totalProgrammes">0</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Quick Actions</h3>
+                    <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showSection('blog')">Add News Post</button>
+                        <button class="btn btn-primary" onclick="showSection('staff')">Manage Staff</button>
+                        <button class="btn btn-primary" onclick="showSection('programmes')">Update Programmes</button>
+                    </div>
+                </div>
+
+                <!-- Home Page Management -->
+                <div id="home" class="section hidden">
+                    <h2>Home Page Content</h2>
+                    <div class="form-group">
+                        <label for="homeTitle">Main Title</label>
+                        <input type="text" id="homeTitle" class="form-control" placeholder="Enter main title">
+                    </div>
+                    <div class="form-group">
+                        <label for="homeContent">Welcome Message</label>
+                        <textarea id="homeContent" class="form-control" placeholder="Enter welcome message"></textarea>
+                    </div>
+                    <button class="btn btn-success" onclick="saveHomeContent()">Save Changes</button>
+                </div>
+
+                <!-- About Us Management -->
+                <div id="about" class="section hidden">
+                    <h2>About Us Content</h2>
+                    <div class="form-group">
+                        <label for="aboutTitle">Page Title</label>
+                        <input type="text" id="aboutTitle" class="form-control" placeholder="Enter page title">
+                    </div>
+                    <div class="form-group">
+                        <label for="aboutContent">About Department</label>
+                        <textarea id="aboutContent" class="form-control" placeholder="Enter about department content"></textarea>
+                    </div>
+                    <button class="btn btn-success" onclick="saveAboutContent()">Save Changes</button>
+                </div>
+
+                <!-- Staff Management -->
+                <div id="staff" class="section hidden">
+                    <h2>Staff Management</h2>
+                    <div class="form-group">
+                        <label for="staffName">Staff Name</label>
+                        <input type="text" id="staffName" class="form-control" placeholder="Enter staff name">
+                    </div>
+                    <div class="form-group">
+                        <label for="staffPosition">Position</label>
+                        <input type="text" id="staffPosition" class="form-control" placeholder="Enter position">
+                    </div>
+                    <div class="form-group">
+                        <label for="staffQualification">Qualification</label>
+                        <input type="text" id="staffQualification" class="form-control" placeholder="Enter qualification">
+                    </div>
+                    <button class="btn btn-primary" onclick="addStaff()">Add Staff</button>
+
+                    <div class="post-list" id="staffList">
+                        <!-- Staff list will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Blog/News Management -->
+                <div id="blog" class="section hidden">
+                    <h2>Blog/News Management</h2>
+                    <div class="form-group">
+                        <label for="postTitle">Post Title</label>
+                        <input type="text" id="postTitle" class="form-control" placeholder="Enter post title">
+                    </div>
+                    <div class="form-group">
+                        <label for="postContent">Post Content</label>
+                        <textarea id="postContent" class="form-control" placeholder="Enter post content"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addPost()">Add Post</button>
+
+                    <div class="post-list" id="postList">
+                        <!-- Posts will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Programmes Management -->
+                <div id="programmes" class="section hidden">
+                    <h2>Programmes Management</h2>
+                    <div class="form-group">
+                        <label for="programmeName">Programme Name</label>
+                        <input type="text" id="programmeName" class="form-control" placeholder="Enter programme name">
+                    </div>
+                    <div class="form-group">
+                        <label for="programmeDuration">Duration</label>
+                        <input type="text" id="programmeDuration" class="form-control" placeholder="e.g., 4 years">
+                    </div>
+                    <div class="form-group">
+                        <label for="programmeDescription">Description</label>
+                        <textarea id="programmeDescription" class="form-control" placeholder="Enter programme description"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addProgramme()">Add Programme</button>
+
+                    <div class="post-list" id="programmeList">
+                        <!-- Programmes will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Contact Us Management -->
+                <div id="contact" class="section hidden">
+                    <h2>Contact Information</h2>
+                    <div class="form-group">
+                        <label for="contactAddress">Address</label>
+                        <textarea id="contactAddress" class="form-control" placeholder="Enter department address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactPhone">Phone</label>
+                        <input type="text" id="contactPhone" class="form-control" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Email</label>
+                        <input type="email" id="contactEmail" class="form-control" placeholder="Enter email address">
+                    </div>
+                    <button class="btn btn-success" onclick="saveContactInfo()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage (in real application, this would be a database)
+        let adminData = JSON.parse(localStorage.getItem('adminData')) || {
+            posts: [],
+            staff: [],
+            programmes: [],
+            home: { title: '', content: '' },
+            about: { title: '', content: '' },
+            contact: { address: '', phone: '', email: '' }
+        };
+
+        // Page titles mapping
+        const pageTitles = {
+            dashboard: 'Admin Dashboard',
+            home: 'Home Page Management',
+            about: 'About Us Management',
+            staff: 'Staff Management',
+            blog: 'Blog/News Management',
+            programmes: 'Programmes Management',
+            contact: 'Contact Information Management'
+        };
+
+        // Login function with updated credentials
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Updated authentication credentials
+            if (username === 'COMPUTERDPT' && password === 'csd@123!#') {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadDashboard();
+            } else {
+                alert('Invalid credentials! Please use:\nUsername: ""\nPassword: ""');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Show section function
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected section
+            document.getElementById(sectionName).classList.remove('hidden');
+
+            // Update page title
+            document.getElementById('pageTitle').textContent = pageTitles[sectionName];
+
+            // Update active menu
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Load section data
+            if (sectionName === 'dashboard') {
+                loadDashboard();
+            } else if (sectionName === 'blog') {
+                loadPosts();
+            } else if (sectionName === 'staff') {
+                loadStaff();
+            } else if (sectionName === 'programmes') {
+                loadProgrammes();
+            } else if (sectionName === 'home') {
+                loadHomeContent();
+            } else if (sectionName === 'about') {
+                loadAboutContent();
+            } else if (sectionName === 'contact') {
+                loadContactInfo();
+            }
+        }
+
+        // Dashboard functions
+        function loadDashboard() {
+            document.getElementById('totalPosts').textContent = adminData.posts.length;
+            document.getElementById('totalStaff').textContent = adminData.staff.length;
+            document.getElementById('totalProgrammes').textContent = adminData.programmes.length;
+        }
+
+        // Blog/News functions
+        function addPost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+
+            if (title && content) {
+                const newPost = {
+                    id: Date.now(),
+                    title,
+                    content,
+                    date: new Date().toLocaleDateString()
+                };
+
+                adminData.posts.unshift(newPost);
+                saveData();
+                loadPosts();
+                
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postContent').value = '';
+            }
+        }
+
+        function loadPosts() {
+            const postList = document.getElementById('postList');
+            postList.innerHTML = '';
+
+            adminData.posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-item';
+                postElement.innerHTML = `
+                    <div>
+                        <strong>${post.title}</strong>
+                        <br>
+                        <small>Posted on: ${post.date}</small>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn btn-primary" onclick="editPost(${post.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deletePost(${post.id})">Delete</button>
+                    </div>
+                `;
+                postList.appendChild(postElement);
+            });
+        }
+
+        function deletePost(id) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                adminData.posts = adminData.posts.filter(post => post.id !== id);
+                saveData();
+                loadPosts();
+                loadDashboard();
+            }
+        }
+
+        // Staff functions
+        function addStaff() {
+            const name = document.getElementById('staffName').value;
+            const position = document.getElementById('staffPosition').value;
+            const qualification = document.getElementById('staffQualification').value;
+
+            if (name && position) {
+                const newStaff = {
+                    id: Date.now(),
+                    name,
+                    position,
+                    qualification
+                };
+
+                adminData.staff.push(newStaff);
+                saveData();
+                loadStaff();
+                
+                document.getElementById('staffName').value = '';
+                document.getElementById('staffPosition').value = '';
+                document.getElementById('staffQualification').value = '';
+            }
+        }
+
+        function loadStaff() {
+            const staffList = document.getElementById('staffList');
+            staffList.innerHTML = '';
+
+            adminData.staff.forEach(staff => {
+                const staffElement = document.createElement('div');
+                staffElement.className = 'post-item';
+                staffElement.innerHTML = `
+                    <div>
+                        <strong>${staff.name}</strong>
+                        <br>
+                        <small>${staff.position} - ${staff.qualification}</small>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn btn-danger" onclick="deleteStaff(${staff.id})">Delete</button>
+                    </div>
+                `;
+                staffList.appendChild(staffElement);
+            });
+        }
+
+        function deleteStaff(id) {
+            if (confirm('Are you sure you want to delete this staff member?')) {
+                adminData.staff = adminData.staff.filter(staff => staff.id !== id);
+                saveData();
+                loadStaff();
+                loadDashboard();
+            }
+        }
+
+        // Programmes functions
+        function addProgramme() {
+            const name = document.getElementById('programmeName').value;
+            const duration = document.getElementById('programmeDuration').value;
+            const description = document.getElementById('programmeDescription').value;
+
+            if (name && duration) {
+                const newProgramme = {
+                    id: Date.now(),
+                    name,
+                    duration,
+                    description
+                };
+
+                adminData.programmes.push(newProgramme);
+                saveData();
+                loadProgrammes();
+                
+                document.getElementById('programmeName').value = '';
+                document.getElementById('programmeDuration').value = '';
+                document.getElementById('programmeDescription').value = '';
+            }
+        }
+
+        function loadProgrammes() {
+            const programmeList = document.getElementById('programmeList');
+            programmeList.innerHTML = '';
+
+            adminData.programmes.forEach(programme => {
+                const programmeElement = document.createElement('div');
+                programmeElement.className = 'post-item';
+                programmeElement.innerHTML = `
+                    <div>
+                        <strong>${programme.name}</strong>
+                        <br>
+                        <small>Duration: ${programme.duration}</small>
+                        <p>${programme.description}</p>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn btn-danger" onclick="deleteProgramme(${programme.id})">Delete</button>
+                    </div>
+                `;
+                programmeList.appendChild(programmeElement);
+            });
+        }
+
+        function deleteProgramme(id) {
+            if (confirm('Are you sure you want to delete this programme?')) {
+                adminData.programmes = adminData.programmes.filter(programme => programme.id !== id);
+                saveData();
+                loadProgrammes();
+                loadDashboard();
+            }
+        }
+
+        // Content management functions
+        function loadHomeContent() {
+            document.getElementById('homeTitle').value = adminData.home.title || '';
+            document.getElementById('homeContent').value = adminData.home.content || '';
+        }
+
+        function saveHomeContent() {
+            adminData.home = {
+                title: document.getElementById('homeTitle').value,
+                content: document.getElementById('homeContent').value
+            };
+            saveData();
+            alert('Home page content saved successfully!');
+        }
+
+        function loadAboutContent() {
+            document.getElementById('aboutTitle').value = adminData.about.title || '';
+            document.getElementById('aboutContent').value = adminData.about.content || '';
+        }
+
+        function saveAboutContent() {
+            adminData.about = {
+                title: document.getElementById('aboutTitle').value,
+                content: document.getElementById('aboutContent').value
+            };
+            saveData();
+            alert('About page content saved successfully!');
+        }
+
+        function loadContactInfo() {
+            document.getElementById('contactAddress').value = adminData.contact.address || '';
+            document.getElementById('contactPhone').value = adminData.contact.phone || '';
+            document.getElementById('contactEmail').value = adminData.contact.email || '';
+        }
+
+        function saveContactInfo() {
+            adminData.contact = {
+                address: document.getElementById('contactAddress').value,
+                phone: document.getElementById('contactPhone').value,
+                email: document.getElementById('contactEmail').value
+            };
+            saveData();
+            alert('Contact information saved successfully!');
+        }
+
+        // Utility function to save data
+        function saveData() {
+            localStorage.setItem('adminData', JSON.stringify(adminData));
+            loadDashboard();
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in (for demo purposes)
+            // In real application, use proper session management
+        });
+    </script>
+</body>
+</html>
